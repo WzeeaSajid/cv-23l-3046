@@ -82,7 +82,7 @@ check_url "${LAMBDA_ADDR}/anything"
 check_url "https://${BUCKET}.s3.amazonaws.com/site/index.html"
 
 section lambda-logs
-if logs=$(aws logs tail "/aws/lambda/${FUNC}" --since 1d --region "$REGION" 2>&1); then
+if logs=$(MSYS_NO_PATHCONV=1 aws logs tail "/aws/lambda/${FUNC}" --since 1d --region "$REGION" 2>&1); then
   echo "$logs" | tail -n 15 >> "$OUT"
 else
   echo "[FAILED] aws logs tail" >> "$OUT"
@@ -90,7 +90,7 @@ else
 fi
 
 section log-retention
-run aws logs describe-log-groups --region "$REGION" \
+run env MSYS_NO_PATHCONV=1 aws logs describe-log-groups --region "$REGION" \
   --log-group-name-prefix "/aws/lambda/${FUNC}" \
   --query "logGroups[].{name:logGroupName,retentionInDays:retentionInDays}" \
   --output json
